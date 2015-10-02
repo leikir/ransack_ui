@@ -22,3 +22,13 @@ en:
     group_rest: "...and where %{combinator} of the following match:"
     add_condition: Add a filter
     remove_condition: Remove filter
+    placeholder_search: Search
+    placeholder_field_select: Select a field
+    other:
+      search: Search
+      search_term: Add a search term
+      select_field: Select_field
+      please_select: Please select a
+      select: Select a
+      select_field_first: "Select a field first"
+      no_matches_found: "No matches found."

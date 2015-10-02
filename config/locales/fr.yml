@@ -1,0 +1,33 @@
+fr:
+  ransack:
+    predicates:
+      alt:
+        date:
+          lt: "est avant"
+          lt_any: "est avant n'importe lequel"
+          lt_all: "est avant tous"
+          lteq: "est avant ou dans"
+          lteq_any: "est avant ou dans"
+          lteq_all: "est avant ou dans"
+          gt: "est après"
+          gt_any: "est après n'importe lequel"
+          gt_all: "est après tous"
+          gteq: "est après ou dans"
+          gteq_any: "est après ou dans n'importe lequel"
+          gteq_all: "est après ou dans tous"
+
+    submit: Rechercher
+    add_group: Rajouter un groupe de filtres
+    group_first: "Montrer les résultats où %{combinator} des conditions suivants sont remplies :"
+    add_condition: Rajouter un filtre
+    remove_condition: Retirer un filtre
+    placeholder_search: Chercher
+    placeholder_field_select: Choisir un champ
+    other:
+      search: Rechercher
+      select_field: Choisir un champ
+      select_field_first: Choisir un champ d'abord
+      please_select: Veuiller sélectionner un
+      select: Sélectionner un
+      search_term: Rajouter un terme
+      no_matches_found: Aucune correspondance.

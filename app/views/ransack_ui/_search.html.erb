@@ -4,7 +4,8 @@
   <%= javascript_tag do %>
     if (window.Ransack == null) { window.Ransack = {}; }
     Ransack.alt_predicates_i18n = <%= I18n.translate(:"ransack.predicates.alt", :default => {}).to_json.html_safe %>;
-    Ransack.value_field_labels  = <%= f.labels_for_value_fields.to_json.html_safe %>
+    Ransack.value_field_labels  = <%= f.labels_for_value_fields.to_json.html_safe %>;
+    Ransack.other_texts = <%= I18n.translate(:"ransack.other", :default => {}).to_json.html_safe %>;
   <% end %>
 
   <div class="row">
