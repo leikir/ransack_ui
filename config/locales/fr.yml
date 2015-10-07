@@ -18,7 +18,7 @@ fr:
 
     submit: Rechercher
     add_group: Rajouter un groupe de filtres
-    group_first: "Montrer les résultats où %{combinator} des conditions suivants sont remplies :"
+    group_first: "Montrer les résultats où %{combinator} les conditions sont remplies"
     add_condition: Rajouter un filtre
     remove_condition: Retirer un filtre
     placeholder_search: Chercher
