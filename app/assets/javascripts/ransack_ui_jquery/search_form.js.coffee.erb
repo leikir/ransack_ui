@@ -227,7 +227,7 @@
           predicate_select.append $("<option value=#{predicate}>#{label}</option>")
 
       # Select first predicate if current selection is invalid
-      predicate_select.select2('val', previous_val)
+      predicate_select.val(previous_val).trigger('change')
 
     # Attempts to find a predicate translation for the specific column type,
     # or returns the default label.
@@ -320,36 +320,45 @@
 
     setup_select2_association: (query_input, selected_attribute, multiple = false) ->
       selected_attribute_val = selected_attribute.val()
+
+      id = query_input.attr("id")
+      value = query_input.val();
+
+      query_input.replaceWith("<select name='#{query_input.attr("name")}' id='#{query_input.attr("id")}'
+        class='#{query_input.attr("class")}'>
+        </select>");
+
+      query_input = $("##{id}")
+
+      # Fetch the preselected item, and add to the control
+      $.ajax(
+        type: 'GET'
+        url: selected_attribute.data('ajax-url')
+      ).then (data) ->
+        $.each data, (i, resource) ->
+          if resource.id == parseInt(value)
+            query_input.append $('<option>',
+              value: resource.id
+              text: resource.text)
+
       # Set up Select2 for query input
       query_input.select2
         placeholder: "Search #{selected_attribute.data('ajax-entity')}"
-        minimumInputLength: 1
         allowClear: true
         multiple: multiple
+        theme: 'bootstrap'
         ajax:
           url: selected_attribute.data('ajax-url')
           dataType: 'json'
-          type: selected_attribute.data('ajax-type')
-          data: (query, page) ->
+          # type: selected_attribute.data('ajax-type')
+          data: (params) ->
             obj = {}
-            obj[selected_attribute.data('ajax-key')] = query
+            obj[selected_attribute.data('ajax-key')] = params.term
             obj
-          results: (data, page) ->
-            {results: $.map(data, (text, id) -> {id: id, text: text}) }
-        initSelection: (element, callback) ->
-          data = []
-          unless element.val().trim() == ""
-            $(element.val().split(",")).each (i, val) ->
-              label = Ransack.value_field_labels[selected_attribute_val]?[val]
-              if label
-                data.push {id: val, text: label}
-              else
-                data.push {id: val, text: val}
-          if data.length
-            callback(multiple and data or data[0])
-          else
-            # If no label could be found, clear value
-            element.select2('val', '')
+          processResults: (data) ->
+            {results: $.map(data, (resource) -> {id: resource.id, text: resource.text}) }
+
+      query_input.val(value).trigger('change')
 
     setup_select2_options: (query_input, selected_attribute, multiple = false) ->
       query_input.select2
