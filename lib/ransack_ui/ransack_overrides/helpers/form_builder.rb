@@ -118,7 +118,7 @@ module Ransack
       def predicate_select(options = {}, html_options = {})
         options = Ransack.options[:default_predicates] || {} if options.blank?
 
-        options[:compounds] = true if options[:compounds].nil?
+        # options[:compounds] = true if options[:compounds].nil?
         keys = predicate_keys(options)
         # If condition is newly built with build_condition(),
         # then replace the default predicate with the first in the ordered list

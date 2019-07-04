@@ -12,8 +12,9 @@
 
       # Store initial predicates and set up Select2 on select lists in .filters
       containers = el.find('.filters')
-      if Select2?
+      if jQuery.fn.select2?
         @init_select2(containers)
+
       @store_initial_predicates(containers)
 
       if $.ransack.button_group_select?
@@ -59,16 +60,16 @@
         @destroy_multi_input(multi_input, selected_attribute.val())
 
       # Handle association columns with AJAX autocomplete
-      if selected_attribute.data('ajax-url') and Select2?
+      if selected_attribute.data('ajax-url') and jQuery.fn.select2?
         @set_option_predicates(base_id, available, column_type)
 
       # Handle columns with options detected from validates :inclusion
-      else if selected_attribute.data('select-options') and Select2?
+      else if selected_attribute.data('select-options') and jQuery.fn.select2?
         @set_option_predicates(base_id, available, column_type, true)
 
       # Handle regular columns
       else
-        if Select2?
+        if jQuery.fn.select2?
           predicate_select2.select2("enable")
 
           # If Select2 is on query input, remove and set defaults
@@ -102,8 +103,8 @@
             predicate_select.append $("<option value=#{predicate}>#{label}</option>")
 
         # Select first predicate if current selection is invalid
-        if Select2?
-          predicate_select.select2('val', previous_val)
+        if jQuery.fn.select2?
+          predicate_select.val(previous_val).trigger('change');
 
       # Run predicate_changed callback
       predicate_select.change()
@@ -138,14 +139,14 @@
       # Hide query input when not needed
       if p in no_query_predicates
         # If Select2 is on query input, remove and set defaults
-        if Select2? && query_select2.length
+        if jQuery.fn.select2? && query_select2.length
           query_input.select2('destroy')
 
         query_input.val("true")
         query_input.hide()
         query_input.parent().find('.ui-datepicker-trigger').hide()
 
-      if Select2?
+      if jQuery.fn.select2?
         # Turn query input into Select2 tag list when query accepts multiple values
         if p in ["in", "not_in"] || p.match(/_(all|any)$/)
           # Add dummy 'multi' input for select2 if not already added
@@ -226,7 +227,7 @@
           predicate_select.append $("<option value=#{predicate}>#{label}</option>")
 
       # Select first predicate if current selection is invalid
-      predicate_select.select2('val', previous_val)
+      predicate_select.val(previous_val).trigger('change')
 
     # Attempts to find a predicate translation for the specific column type,
     # or returns the default label.
@@ -288,7 +289,7 @@
       # Hide all query inputs
       inputs.hide()
 
-      if Select2?
+      if jQuery.fn.select2?
         # Find newly created input and setup Select2
         multi_query = @element.find('#' + multi_id)
 
@@ -319,36 +320,45 @@
 
     setup_select2_association: (query_input, selected_attribute, multiple = false) ->
       selected_attribute_val = selected_attribute.val()
+
+      id = query_input.attr("id")
+      value = query_input.val();
+
+      query_input.replaceWith("<select name='#{query_input.attr("name")}' id='#{query_input.attr("id")}'
+        class='#{query_input.attr("class")}'>
+        </select>");
+
+      query_input = $("##{id}")
+
+      # Fetch the preselected item, and add to the control
+      $.ajax(
+        type: 'GET'
+        url: selected_attribute.data('ajax-url')
+      ).then (data) ->
+        $.each data, (i, resource) ->
+          if resource.id == parseInt(value)
+            query_input.append $('<option>',
+              value: resource.id
+              text: resource.text)
+
       # Set up Select2 for query input
       query_input.select2
         placeholder: "Search #{selected_attribute.data('ajax-entity')}"
-        minimumInputLength: 1
         allowClear: true
         multiple: multiple
+        theme: 'bootstrap'
         ajax:
           url: selected_attribute.data('ajax-url')
           dataType: 'json'
-          type: selected_attribute.data('ajax-type')
-          data: (query, page) ->
+          # type: selected_attribute.data('ajax-type')
+          data: (params) ->
             obj = {}
-            obj[selected_attribute.data('ajax-key')] = query
+            obj[selected_attribute.data('ajax-key')] = params.term
             obj
-          results: (data, page) ->
-            {results: $.map(data, (text, id) -> {id: id, text: text}) }
-        initSelection: (element, callback) ->
-          data = []
-          unless element.val().trim() == ""
-            $(element.val().split(",")).each (i, val) ->
-              label = Ransack.value_field_labels[selected_attribute_val]?[val]
-              if label
-                data.push {id: val, text: label}
-              else
-                data.push {id: val, text: val}
-          if data.length
-            callback(multiple and data or data[0])
-          else
-            # If no label could be found, clear value
-            element.select2('val', '')
+          processResults: (data) ->
+            {results: $.map(data, (resource) -> {id: resource.id, text: resource.text}) }
+
+      query_input.val(value).trigger('change')
 
     setup_select2_options: (query_input, selected_attribute, multiple = false) ->
       query_input.select2
@@ -401,7 +411,7 @@
       target.before content.replace(regexp, new_id)
       prev_container = target.prev()
 
-      if Select2?
+      if jQuery.fn.select2?
         @init_select2(prev_container)
 
       if $.ransack.button_group_select?
@@ -433,38 +443,17 @@
 
     init_select2: (container) ->
       container.find('select.ransack_predicate').select2
-        width: '160px'
+        theme: 'bootstrap'
         formatNoMatches: (term) ->
           Ransack.other_texts.select_field_first
 
       container.find('select.ransack_attribute').select2
-        width: '230px'
+        theme: 'bootstrap'
         placeholder: Ransack.other_texts.select_field
         allowClear: true
-        formatSelection: (object, container) ->
-          # If initializing and element is not present,
-          # search for option element in original select tag
-          if !object.element
-            this.element.find('option').each (i, option) ->
-              if option.value == object.id
-                object.element = option
-                return false
-
-          # Return 'Model: field' unless column is on root model
-          if $(object.element).data('root-model')
-            object.text
-          else
-            group_label = $(object.element).parent().attr('label')
-            # Avoid labels like 'Contact: Contact'
-            if group_label == object.text
-              object.text
-            else if group_label?
-              group_label + ': ' + object.text
-            else
-              object.text
 
       @element.find('select.ransack_sort').select2
-        width: '230px'
+        theme: 'bootstrap'
         placeholder: Ransack.other_texts.select_field
 
     init_button_group_select: (containers) ->
