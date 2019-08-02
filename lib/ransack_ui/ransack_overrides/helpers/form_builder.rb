@@ -119,7 +119,7 @@ module Ransack
         options = Ransack.options[:default_predicates] || {} if options.blank?
 
         # options[:compounds] = true if options[:compounds].nil?
-        keys = predicate_keys(options)
+        keys = predicate_keys(options).rotate(2)
         # If condition is newly built with build_condition(),
         # then replace the default predicate with the first in the ordered list
         @object.predicate_name = keys.first if @object.default?
