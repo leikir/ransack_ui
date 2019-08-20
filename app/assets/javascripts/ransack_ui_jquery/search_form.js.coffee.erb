@@ -36,12 +36,12 @@
       base_id = target.attr('id').slice(0, -8)
       predicate_select  = @element.find("select##{base_id}p")
       available = predicate_select.data['predicates']
-      query_input = $("input##{base_id}v_0_value")
+      query_input = $("##{base_id}v_0_value")
       multi_id = query_input.attr('id') + '_multi'
       multi_input = @element.find("##{multi_id}")
-      query_select2_id = "#s2id_#{base_id}v_0_value"
+      query_select2_id = "select##{base_id}v_0_value"
       query_select2 = @element.find(query_select2_id)
-      predicate_select2_id = "#s2id_#{base_id}p"
+      predicate_select2_id = "##{base_id}p"
       predicate_select2 = @element.find(predicate_select2_id)
 
       # Initialize datepicker if column is date/datetime/time
@@ -53,7 +53,14 @@
 
       # Destroy any query select2 inputs on attribute change and clear input
       if query_select2.length
+        id = query_input.attr("id")
+
         query_input.select2('destroy')
+        query_input.replaceWith("<input type='text' name='#{query_input.attr("name")}' id='#{query_input.attr("id")}'
+        class='#{query_input.attr("class")}'>
+        </input>");
+
+        query_input = $("##{id}")
 
       # Destroy any multi-inputs on attribute change and clear input
       if multi_input.length
