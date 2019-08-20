@@ -336,7 +336,7 @@
         url: selected_attribute.data('ajax-url')
       ).then (data) ->
         $.each data, (i, resource) ->
-          if resource.id == parseInt(value)
+          if resource.id.toString(10) == value
             query_input.append $('<option>',
               value: resource.id
               text: resource.text)
