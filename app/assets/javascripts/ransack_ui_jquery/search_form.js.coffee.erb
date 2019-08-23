@@ -39,7 +39,7 @@
       query_input = $("##{base_id}v_0_value")
       multi_id = query_input.attr('id') + '_multi'
       multi_input = @element.find("##{multi_id}")
-      query_select2_id = "select##{base_id}v_0_value"
+      query_select2_id = "##{base_id}v_0_value"
       query_select2 = @element.find(query_select2_id)
       predicate_select2_id = "##{base_id}p"
       predicate_select2 = @element.find(predicate_select2_id)
@@ -54,13 +54,12 @@
       # Destroy any query select2 inputs on attribute change and clear input
       if query_select2.length
         id = query_input.attr("id")
-
-        query_input.select2('destroy')
-        query_input.replaceWith("<input type='text' name='#{query_input.attr("name")}' id='#{query_input.attr("id")}'
-        class='#{query_input.attr("class")}'>
-        </input>");
-
-        query_input = $("##{id}")
+        if $(query_input).hasClass("select2-hidden-accessible")
+          query_input.select2('destroy')
+          query_input.replaceWith("<input type='text' name='#{query_input.attr("name")}' id='#{query_input.attr("id")}'
+          class='#{query_input.attr("class")}'>
+          </input>");
+          query_input = $("##{id}")
 
       # Destroy any multi-inputs on attribute change and clear input
       if multi_input.length
@@ -80,7 +79,7 @@
           predicate_select2.select2("enable")
 
           # If Select2 is on query input, remove and set defaults
-          if query_select2.length > 0
+          if $(query_input).hasClass("select2-hidden-accessible")
             query_input.select2('destroy')
             query_input.val('')
             previous_val = ''
@@ -146,7 +145,7 @@
       # Hide query input when not needed
       if p in no_query_predicates
         # If Select2 is on query input, remove and set defaults
-        if jQuery.fn.select2? && query_select2.length
+        if jQuery.fn.select2? && $(query_input).hasClass("select2-hidden-accessible")
           query_input.select2('destroy')
 
         query_input.val("true")
@@ -162,7 +161,7 @@
             @setup_multi_query_input(target, query_input, multi_id, selected_attribute)
 
           # If Select2 is on query input, remove and set defaults
-          if query_select2.length
+          if $(query_input).hasClass("select2-hidden-accessible")
             query_input.select2('destroy').hide()
 
           return
@@ -184,14 +183,14 @@
 
             # Handle association columns with AJAX autocomplete
             if selected_attribute.data('ajax-url')
-              if query_select2.length
+              if $(query_input).hasClass("select2-hidden-accessible")
                 query_input.hide()
               else
                 @setup_select2_association(query_input, selected_attribute)
 
             # Handle fixed options - set up Select2 for single values if not already present
             if selected_attribute.data('select-options')
-              if query_select2.length
+              if $(query_input).hasClass("select2-hidden-accessible")
                 query_input.hide()
               else
                 @setup_select2_options(query_input, selected_attribute)
@@ -303,7 +302,7 @@
         # Handle association columns with AJAX autocomplete
         if selected_attribute.data('ajax-url')
           # Set label to single association label, if anything was selected
-          if query_select2.length && query_input.select2('data')
+          if $(query_input).hasClass("select2-hidden-accessible") && query_input.select2('data')
             query_input_data = query_input.select2('data')
             Ransack.value_field_labels[selected_attribute.val()] ||= {}
             Ransack.value_field_labels[selected_attribute.val()][query_input_data.id] = query_input_data.text
@@ -450,7 +449,7 @@
           predicates.push [o.val(), o.text()]
         predicate_select.data['predicates'] = predicates
 
-    init_select2: (container) ->
+    init_select2: (container) ->      
       container.find('select.ransack_predicate').select2
         theme: 'bootstrap'
         formatNoMatches: (term) ->
