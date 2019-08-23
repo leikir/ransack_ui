@@ -320,6 +320,7 @@
             multi_query.select2
               tags: []
               tokenSeparators: [',']
+              theme: 'bootstrap'
               formatNoMatches: (t) ->
                 Ransack.other_texts.search_term
 
@@ -374,6 +375,7 @@
         allowClear: true
         multiple: multiple
         tokenSeparators: [',']
+        theme: 'bootstrap'
         formatNoMatches:
           if selected_attribute.data('select-options')
             (t) -> Ransack.other_texts.no_matches_found
