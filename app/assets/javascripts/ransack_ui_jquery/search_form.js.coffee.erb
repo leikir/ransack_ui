@@ -108,12 +108,13 @@
             label = @alt_predicate_label_or_default(predicate, column_type, label)
             predicate_select.append $("<option value=#{predicate}>#{label}</option>")
 
-        # Select "contains" by default
-        predicate_select.val('cont').trigger('change');
-
         # Select first predicate if current selection is invalid
-        # if jQuery.fn.select2?
-        #   predicate_select.val(previous_val).trigger('change');
+        if jQuery.fn.select2?
+          predicate_select.val(previous_val).trigger('change');
+
+          # Select "contains" by default
+          if !predicate_select.val()
+            predicate_select.val('cont').trigger('change');
 
       # Run predicate_changed callback
       predicate_select.change()
