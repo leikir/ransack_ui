@@ -240,7 +240,8 @@ module Ransack
             column: column,
             attribute: attribute
           }
-          attribute_data[:foreign_klass] = foreign_klass if foreign_klass
+          # attribute_data[:foreign_klass] = foreign_klass if foreign_klass
+
           attribute_data
         end.compact
       end
