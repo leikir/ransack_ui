@@ -16,6 +16,7 @@ module Ransack
         end
 
         bases = [''] + association_array(options[:associations])
+
         if bases.size > 1
           @template.select(
             @object_name, :name,
@@ -132,9 +133,10 @@ module Ransack
       def attribute_collection_for_bases(bases)
         bases.map do |base|
           if collection = attribute_collection_for_base(base)
+            association_translated = Translate.association(base, :context => object.context)
             [
-              Translate.association(base, :context => object.context),
-              collection
+              association_translated,
+              base.blank? ? collection : collection.map { |instance| instance[0] = "#{association_translated} #{instance[0]}"; instance }
             ]
           end
         end.compact
